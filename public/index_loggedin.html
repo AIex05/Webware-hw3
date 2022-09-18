@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>CS4241 Assignment 2</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./css/skeleton.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap" rel="stylesheet">
+    <script src="./JS/client.js"></script>
+</head>
+
+<body>
+    <form action="">
+        <div class="div">
+            <h1>Welcome to Everyday Quest</h1>
+            <a>Already Logged In</a>
+            <p>The fields are (School, Life, Challenge)</p>
+            <p>Type in the field you want to work on:</p>
+            <select id="fieldname">
+                <option>School</option>
+                <option>Life</option>
+                <option>Challenge</option>
+            </select>
+            <button id="Submit">submit</button>
+            <p>Press Submit to retreive a quest:</p>
+            <p id="QuestReceived" style="display: flex; font-size: 3em; justify-content: center; background-color: aliceblue;">What ever is the quest (will be generated)</p>
+            <div class="row">
+                <div class="one column"><p></p></div>
+                <div class="eight columns"><button class="button-primary" id="Done">I did it!</botton></div>
+                <div class="one column"><button id="NotDone">I did not :(</button></div>
+                <div class="two columns"></div>
+            </div>
+            <h3>Want to add some quests?</h3>
+            <div class="row">
+                <div class="one column"><input type="text" id="QuestName" placeholder="What is the Quest?" /></div>
+                <div class="two columns">
+                    <select id="QuestType">
+                        <option>School</option>
+                        <option>Life</option>
+                        <option>Challenge</option>
+                    </select>
+                </div>
+                <div class="one column"><button id="addquest">Add Quest</button></div>
+            </div>
+            <p id="successAdd"></p>
+            <h3>Don't like the quest?</h3>
+            <div class="row">
+                <div class="one column"><input type="text" id="DQuestName" placeholder="What is the Quest?" /></div>
+                <div class="one columns"><p></p></div>
+                <div class="one column"><button id="Daddquest">Delete Quest</button></div>
+            </div>
+            <button id="Result">Get Database</button>
+        </div>
+        <div id="database"></div>
+    </form>
+</body>
+
+</html>

@@ -4,6 +4,96 @@ const path = require("path");
 const moment = require("moment");
 const app = express();
 
+var passport = require('passport');
+var util = require('util');
+var session = require('express-session');
+var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
+var GitHubStrategy = require('passport-github2').Strategy;
+var partials = require('express-partials');
+
+var GITHUB_CLIENT_ID = "e2b5d69b73001a9c0606";
+var GITHUB_CLIENT_SECRET = "d522e0361838f5e5a7c94ee901a07ccb5a546c70";
+
+let LoggedIn = false;
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
+
+passport.use(new GitHubStrategy({
+  clientID: GITHUB_CLIENT_ID,
+  clientSecret: GITHUB_CLIENT_SECRET,
+  callbackURL: "http://localhost:3000/index_loggedin.html"
+},
+function(accessToken, refreshToken, profile, done) {
+  // asynchronous verification, for effect...
+  process.nextTick(function () {
+    
+    // To keep the example simple, the user's GitHub profile is returned to
+    // represent the logged-in user.  In a typical application, you would want
+    // to associate the GitHub account with a user record in your database,
+    // and return that user instead.
+    LoggedIn = true;
+    console.log(LoggedIn);
+    return done(null, profile);
+  });
+}
+));
+
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+app.use(partials());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(methodOverride());
+app.use(session({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
+// Initialize Passport!  Also use passport.session() middleware, to support
+// persistent login sessions (recommended).
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.static(__dirname + '/public'));
+
+// GET /auth/github
+//   Use passport.authenticate() as route middleware to authenticate the
+//   request.  The first step in GitHub authentication will involve redirecting
+//   the user to github.com.  After authorization, GitHub will redirect the user
+//   back to this application at /auth/github/callback
+app.get('/auth/github',
+  passport.authenticate('github', { scope: [ 'user:email' ] }),
+  function(req, res){
+    // The request will be redirected to GitHub for authentication, so this
+    // function will not be called.
+  });
+
+// GET /auth/github/callback
+//   Use passport.authenticate() as route middleware to authenticate the
+//   request.  If authentication fails, the user will be redirected back to the
+//   login page.  Otherwise, the primary route function will be called,
+//   which, in this example, will redirect the user to the home page.
+app.get('/auth/github/callback', 
+  passport.authenticate('github', { failureRedirect: '/' }),
+  function(req, res) {
+    LoggedIn = true
+    res.redirect('/');
+  });
+
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
+
+// Simple route middleware to ensure user is authenticated.
+//   Use this route middleware on any resource that needs to be protected.  If
+//   the request is authenticated (typically via a persistent login session),
+//   the request will proceed.  Otherwise, the user will be redirected to the
+//   login page.
+
+
 /*
 complete functionalities:
   Submit
@@ -187,26 +277,19 @@ const logger = (req, res, next) => {
 
 app.get("/GetAll", async function GetAllSend(req, res) {
   console.log("Get Database!");
-  GetCollection(DB, Collection, res).then((o) => {
-    res.send(o);
-  });
-});
-async function GetCollection(DB, Collection) {
-  try {
-    console.log(`Connecting to ${DB}, Collection: ${Collection}`);
+  console.log(`Connecting to ${DB}, Collection: ${Collection}`);
     const database = client.db(DB);
     const quests = database.collection(Collection);
     console.log(`Connection Success!`);
-    const query = { Category: { $ne: "a" } };
-    const DB_all = await quests.find(query);
-    DB_all.forEach((result) => {
-      let k = JSON.stringify(result);
-      db_lst.push(k);
+    //const query = { Category: { $ne: "a" } };
+    quests.find({}).toArray(function (err, result) {
+      if (err) {
+          console.log(err)
+      } else {
+          res.end(JSON.stringify(result));
+      }
     });
-  } catch {
-    console.log("error occure");
-  }
-}
+});
 
 app.use(express.static(path.join(__dirname, "public")));
 const PORT = process.env.PORT || 3000;

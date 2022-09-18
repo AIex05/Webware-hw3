@@ -21,87 +21,106 @@ const submit = function (event) {
     });
 };
 
-const GetDB = function () {
+const GetDB = function (e) {
+  e.preventDefault();
   fetch("/GetAll", {
     method: "GET",
   })
-    .then(responses => {
-      console.log(responses)
-      }
-    ).catch (
-      console.log('error occured when displaying Whole database')
-    )
-  }
+    .then((res) => {
+      return res.json();
+    })
+    .then((res) => {
+      console.log(res);
+      clearBox("database");
+      res.forEach((item) => {
+        const Q = item.Quest;
+        const C = item.Category;
+        const D = item.Done;
+        var ul = document.createElement("ul");
+        ul.innerText = `Quest: ${Q}, Category: ${C}, Done?: ${D}`;
+        const db = document.querySelector("#database");
+        db.appendChild(ul);
+      });
+    });
+};
 
 const Done = function (e) {
   e.preventDefault();
-    const q = document.querySelector('#QuestReceived')
-    console.log(q.innerText);
-    const json = { Body: q.innerText };
-    const body = JSON.stringify(json);
+  const q = document.querySelector("#QuestReceived");
+  console.log(q.innerText);
+  const json = { Body: q.innerText };
+  const body = JSON.stringify(json);
 
-    fetch("/Done", {
-      method: "POST",
-      body,
-    })
-      .then((response) => {
-        console.log(response);
-      })
-    return false;
-}
+  fetch("/Done", {
+    method: "POST",
+    body,
+  }).then((response) => {
+    console.log(response);
+  });
+  return false;
+};
 
 const NotDone = function (e) {
   e.preventDefault();
-    const q = document.querySelector('#QuestReceived')
-    console.log(q.innerText);
-    const json = { Body: q.innerText };
-    const body = JSON.stringify(json);
+  const q = document.querySelector("#QuestReceived");
+  console.log(q.innerText);
+  const json = { Body: q.innerText };
+  const body = JSON.stringify(json);
 
-    fetch("/NotDone", {
-      method: "POST",
-      body,
-    })
-      .then((response) => {
-        console.log(response);
-      })
-    return false;
-}
+  fetch("/NotDone", {
+    method: "POST",
+    body,
+  }).then((response) => {
+    console.log(response);
+  });
+  return false;
+};
 
 const AddQuest = function (e) {
   e.preventDefault();
-  const Q_name = document.querySelector("#QuestName")
-  const Q_type = document.querySelector("#QuestType")
+  const Q_name = document.querySelector("#QuestName");
+  const Q_type = document.querySelector("#QuestType");
   const Q_n_str = Q_name.value;
   const Q_t_str = Q_type.value;
-  const json = {Quest : Q_n_str, Category : Q_t_str}
+  const json = { Quest: Q_n_str, Category: Q_t_str };
   const body = JSON.stringify(json);
 
-  fetch('/AddQuest', {
-    method:"POST",
+  fetch("/AddQuest", {
+    method: "POST",
     body,
-  }).then (
-    response => {
-      const k = document.querySelector("#QuestName");
-      k.value = '';
-    }
-  )
-}
+  }).then((response) => {
+    const k = document.querySelector("#QuestName");
+    k.value = "";
+  });
+};
 
 const DeleteQuest = function (e) {
   const Q_name = document.querySelector("#DQuestName");
   const Q_n_str = Q_name.value;
-  const json = {Quest : Q_n_str}
+  const json = { Quest: Q_n_str };
   const body = JSON.stringify(json);
 
-  fetch('/DeleteQuest', {
-    method:"POST",
+  fetch("/DeleteQuest", {
+    method: "POST",
     body,
-  }).then(response => {
-    console.log("Delete Success.")
+  }).then((response) => {
+    console.log("Delete Success.");
     const k = document.querySelector("#QuestName");
-    k.value = '';
-  })
-}
+    k.value = "";
+  });
+};
+
+const Loggin = function (e) {
+  e.preventDefault();
+
+  fetch(
+    "/auth/github",
+    { mode: "no-cors" },
+    {
+      method: "GET",
+    }
+  ).then(console.log("Loggin clicked"));
+};
 
 window.onload = function () {
   const button_submit = document.querySelector("#Submit");
